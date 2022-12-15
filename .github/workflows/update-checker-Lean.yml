@@ -12,7 +12,8 @@
 name: -Source Update Checker-
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+#  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: https://github.com/kenzok8/small-package
   REPO_BRANCH: master
 
 on:
