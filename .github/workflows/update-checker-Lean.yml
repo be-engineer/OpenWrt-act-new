@@ -9,64 +9,49 @@
 # Description: Source code update checker
 #
 
-name: Update Checker
+name: -Source Update Checker-
 
 env:
-  REPO_URL: https://github.com/kenzok8/small-package
-  REPO_BRANCH: main
-  TZ: Asia/Shanghai
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  #  REPO_URL: https://github.com/kenzok8/small-package
+  REPO_BRANCH: master
 
 on:
-  schedule:
-    - cron: 0 0 * * FRI
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version"
-        required: false
-        default: ""
+  schedule:
+    - cron: 0 0 ? * FRI
 
 jobs:
-  jell:
+  check:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 获取提交哈希值
+      - name: Get Commit Hash
         id: getHash
         run: |
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-          echo "::set-output name=commitHash::$(git rev-parse HEAD)"
-
-      - name: 比较提交哈希值
+          #echo "::set-output name=commitHash::$(git rev-parse HEAD)"
+          echo  "{commitHash}={$(git rev-parse HEAD)}">> $GITHUB_OUTPUT
+      - name: Compare Commit Hash
         id: cacheHash
         uses: actions/cache@v2
         with:
           path: .commitHash
           key: HEAD-${{ steps.getHash.outputs.commitHash }}
 
-      - name: 保存新的哈希值
+      - name: Save New Commit Hash
         if: steps.cacheHash.outputs.cache-hit != 'true'
         run: |
           echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
-
-      - name: 设置当前的日期
-        id: date
-        run: |
-          echo "date=$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_ENV
-          echo "date2=$(date +'%m/%d %Y')" >> $GITHUB_ENV
-          echo "date3=$(date +'%m.%d')" >> $GITHUB_ENV
-          echo "date4=$(date +'%m.%d.%H')" >> $GITHUB_ENV        
-          sudo timedatectl set-timezone "$TZ"
-
-      - name: 触发编译
+      - name: Trigger build
         if: steps.cacheHash.outputs.cache-hit != 'true'
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.REPO_TOKEN }}
-          event-type: ${{ env.date3 }} ${{ github.event.inputs.version }}
+          token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+          event-type: Source Code Update
 
-      - name: 删除工作流
-        uses: Mattraks/delete-workflow-runs@v2.0.2
+      - name: Delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
         with:
-          retain_days: 1
-          keep_minimum_runs: 1
+          retain_days: 14
+          keep_minimum_runs: 3
