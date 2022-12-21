@@ -93,14 +93,14 @@ jobs:
         run: |
           cd openwrt
           mkdir conf
-          cp .config conf/$DEVICE_NAME
+          #cp .config conf/$DEVICE_NAME
           cp .config conf/config_file
 
       - name: Upload config file
         uses: actions/upload-artifact@main
         with:
           name: OpenWrt_config${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-          path: conf/
+          path: openwrt/conf
 
       - name: Download package
         id: package
