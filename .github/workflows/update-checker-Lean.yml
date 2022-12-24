@@ -35,7 +35,7 @@ jobs:
 
     - name: Compare Commit Hash
       id: cacheHash
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       #uses: peter-evans/repository-dispatch@v1
       with:
         path: .commitHash
@@ -47,7 +47,7 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
     - name: Trigger build
       if: steps.cacheHash.outputs.cache-hit != 'true'
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       #uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
