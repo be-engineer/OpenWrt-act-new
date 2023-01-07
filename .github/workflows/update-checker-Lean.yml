@@ -18,7 +18,7 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    - cron: 10 17 ? * SAT  
+    - cron: 6 4 * * FRI 
 
 jobs:
   check:
